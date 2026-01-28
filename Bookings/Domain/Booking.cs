@@ -1,4 +1,6 @@
-﻿namespace Bookings.Domain;
+﻿using Bookings.Common;
+
+namespace Bookings.Domain;
 
 // Value Object - BookingConfiguration
 public record BookingConfiguration(BookingModality Modality, MatchType MatchType);
@@ -89,9 +91,14 @@ public class Booking
         return new Price((decimal)hours * courtPricePerHour, currency);
     }
 
-    public void AddPlayer(Guid userId, PlayerRank rank)
+    public Result AddPlayer(Guid userId, PlayerRank rank)
     {
-        PlayerCanJoin(userId, rank);
+        var playerCanJoinResult = PlayerCanJoin(userId, rank);
+
+        if (!playerCanJoinResult.IsSuccess)
+        {
+            return playerCanJoinResult;
+        }
 
         _players.Add(new Player(userId, rank, false));
 
@@ -99,40 +106,45 @@ public class Booking
         {
             Status = BookingStatus.PendingPayment;
         }
+
+        return Result.Success();
     }
 
-    public void PlayerCanJoin(Guid userId, PlayerRank rank)
+    public Result PlayerCanJoin(Guid userId, PlayerRank rank)
     {
-        if (Configuration.Modality != BookingModality.Matchmaking)
-        {
-            throw new DomainException("Only matchmaking bookings can add players");
-        }
-
-        if (_players.Any(p => p.UserId == userId))
-        {
-            throw new DomainException("Player already in booking");
-        }
-
         var requester = _players.FirstOrDefault(p => p.IsRequester);
+
         if (requester == null)
         {
             throw new DomainException("No requester in booking");
         }
 
-        if (Status != BookingStatus.WaitingForPlayers)
+        if (Configuration.Modality != BookingModality.Matchmaking)
         {
-            throw new DomainException("Booking not waiting for players");
+            return Result.Failure(BookingErrors.OnlyMatchmakingCanAddPlayers);
         }
 
-        if (_players.Count >= GetMaxPlayers())
+        if (Status != BookingStatus.WaitingForPlayers)
         {
-            throw new DomainException("Booking is full");
+            return Result.Failure(BookingErrors.BookingNotWaiting);
         }
 
         if (requester.Rank != rank)
         {
-            throw new DomainException("Player rank does not match");
+            return Result.Failure(BookingErrors.InvalidPlayerRank);
         }
+
+        if (_players.Count >= GetMaxPlayers())
+        {
+            return Result.Failure(BookingErrors.BookingFull);
+        }
+
+        if (_players.Any(p => p.UserId == userId))
+        {
+            return Result.Failure(BookingErrors.PlayerAlreadyInBooking);
+        }
+
+        return Result.Success();
     }
 
     private int GetMaxPlayers() => Configuration.MatchType switch

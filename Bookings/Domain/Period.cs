@@ -12,7 +12,7 @@ public record Period
     {
         if (end <= start)
         {
-            throw new ArgumentException("End date must be after start date.");
+            throw new ArgumentException("End date must be after start date");
         }
 
         Start = start;

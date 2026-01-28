@@ -21,7 +21,7 @@ public record Price
     {
         if (Currency != other.Currency)
         {
-            throw new InvalidOperationException("Cannot add prices with different currencies.");
+            throw new InvalidOperationException("Cannot add prices with different currencies");
         }
 
         return new Price(Amount + other.Amount, Currency);
