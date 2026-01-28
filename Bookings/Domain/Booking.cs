@@ -1,7 +1,7 @@
 ﻿namespace Bookings.Domain;
 
 // Value Object - BookingConfiguration
-public record BookingConfiguration(BookingMode Mode, MatchType MatchType);
+public record BookingConfiguration(BookingModality Modality, MatchType MatchType);
 
 // Aggregate Root - Booking
 public class Booking
@@ -49,7 +49,7 @@ public class Booking
         CourtId = courtId;
         Configuration = configuration;
 
-        Status = configuration.Mode == BookingMode.Matchmaking
+        Status = configuration.Modality == BookingModality.Matchmaking
             ? BookingStatus.WaitingForPlayers
             : BookingStatus.Pending;
 
@@ -91,34 +91,48 @@ public class Booking
 
     public void AddPlayer(Guid userId, PlayerRank rank)
     {
-        ValidatePlayerCanJoin(userId, rank);
+        PlayerCanJoin(userId, rank);
 
         _players.Add(new Player(userId, rank, false));
 
         if (_players.Count >= GetMaxPlayers())
+        {
             Status = BookingStatus.PendingPayment;
+        }
     }
 
-    private void ValidatePlayerCanJoin(Guid userId, PlayerRank rank)
+    public void PlayerCanJoin(Guid userId, PlayerRank rank)
     {
-        if (Configuration.Mode != BookingMode.Matchmaking)
+        if (Configuration.Modality != BookingModality.Matchmaking)
+        {
             throw new DomainException("Only matchmaking bookings can add players");
+        }
 
         if (_players.Any(p => p.UserId == userId))
+        {
             throw new DomainException("Player already in booking");
+        }
 
         var requester = _players.FirstOrDefault(p => p.IsRequester);
         if (requester == null)
+        {
             throw new DomainException("No requester in booking");
+        }
 
         if (Status != BookingStatus.WaitingForPlayers)
+        {
             throw new DomainException("Booking not waiting for players");
+        }
 
         if (_players.Count >= GetMaxPlayers())
+        {
             throw new DomainException("Booking is full");
+        }
 
         if (requester.Rank != rank)
+        {
             throw new DomainException("Player rank does not match");
+        }
     }
 
     private int GetMaxPlayers() => Configuration.MatchType switch
