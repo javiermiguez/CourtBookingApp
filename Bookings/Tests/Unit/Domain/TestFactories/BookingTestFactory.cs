@@ -1,5 +1,5 @@
 ﻿using Bookings.Domain;
-using MatchType = Bookings.Domain.MatchType;
+using GameType = Bookings.Domain.GameType;
 
 namespace Bookings.Tests.Unit.Domain.TestFactories;
 
@@ -27,7 +27,7 @@ public class BookingTestFactory
         if (configuration == null)
         {
             configuration = new BookingConfiguration(
-                BookingModality.Direct, MatchType.Singles);
+                BookingModality.Direct, GameType.Singles);
         }
 
         if (period == null)

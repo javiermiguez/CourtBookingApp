@@ -2,7 +2,6 @@
 using Bookings.Domain;
 using Bookings.Tests.Unit.Domain.TestFactories;
 using Xunit;
-using MatchType = Bookings.Domain.MatchType;
 
 namespace Bookings.Tests.Unit.Domain;
 
@@ -75,7 +74,7 @@ public class BookingTests
         BookingStatus expectedStatus)
     {
         // Arrange
-        var configuration = new BookingConfiguration(modality, MatchType.Singles);
+        var configuration = new BookingConfiguration(modality, GameType.Singles);
 
         // Act
         var booking = BookingTestFactory.CreateTestBooking(configuration: configuration);
@@ -89,7 +88,7 @@ public class BookingTests
     {
         // Arrange
         var booking = BookingTestFactory.CreateTestBooking(
-            configuration: new BookingConfiguration(BookingModality.Matchmaking, MatchType.Doubles),
+            configuration: new BookingConfiguration(BookingModality.Matchmaking, GameType.Doubles),
             rank: PlayerRank.Intermediate);
 
         // Act
@@ -107,7 +106,7 @@ public class BookingTests
     {
         // Arrange
         var booking = BookingTestFactory.CreateTestBooking(
-            configuration: new BookingConfiguration(BookingModality.Direct, MatchType.Doubles),
+            configuration: new BookingConfiguration(BookingModality.Direct, GameType.Doubles),
             rank: PlayerRank.Intermediate);
 
         // Act
@@ -120,9 +119,9 @@ public class BookingTests
     }
 
     [Theory]
-    [InlineData(MatchType.Singles, 2)]
-    [InlineData(MatchType.Doubles, 4)]
-    public void Booking_ShouldRespectMaxPlayers(MatchType matchType, int maxPlayers)
+    [InlineData(GameType.Singles, 2)]
+    [InlineData(GameType.Doubles, 4)]
+    public void Booking_ShouldRespectMaxPlayers(GameType matchType, int maxPlayers)
     {
         // Arrange
         var booking = BookingTestFactory.CreateTestBooking(

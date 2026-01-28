@@ -1,6 +1,6 @@
 ﻿namespace Bookings.Domain;
 
-public enum MatchType
+public enum GameType
 {
     Singles = 0,
     Doubles = 1

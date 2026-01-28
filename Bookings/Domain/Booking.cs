@@ -3,7 +3,7 @@
 namespace Bookings.Domain;
 
 // Value Object - BookingConfiguration
-public record BookingConfiguration(BookingModality Modality, MatchType MatchType);
+public record BookingConfiguration(BookingModality Modality, GameType GameType);
 
 // Aggregate Root - Booking
 public class Booking
@@ -142,10 +142,10 @@ public class Booking
         return Result.Success();
     }
 
-    private int GetMaxPlayers() => Configuration.MatchType switch
+    private int GetMaxPlayers() => Configuration.GameType switch
     {
-        MatchType.Singles => 2,
-        MatchType.Doubles => 4,
-        _ => throw new InvalidOperationException("Unknown match type")
+        GameType.Singles => 2,
+        GameType.Doubles => 4,
+        _ => throw new InvalidOperationException("Unknown game type")
     };
 }
