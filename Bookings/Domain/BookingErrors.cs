@@ -16,10 +16,6 @@ public static class BookingErrors
         "Booking.InvalidPlayerRank",
         "Player rank does not match booking requirements");
 
-    public static readonly Error BookingFull = new(
-        "Booking.BookingFull",
-        "The booking has reached maximum players");
-
     public static readonly Error PlayerAlreadyInBooking = new(
         "Booking.PlayerAlreadyInBooking",
         "Player is already in this booking");

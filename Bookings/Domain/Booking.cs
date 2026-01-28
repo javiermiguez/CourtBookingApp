@@ -134,11 +134,6 @@ public class Booking
             return Result.Failure(BookingErrors.InvalidPlayerRank);
         }
 
-        if (_players.Count >= GetMaxPlayers())
-        {
-            return Result.Failure(BookingErrors.BookingFull);
-        }
-
         if (_players.Any(p => p.UserId == userId))
         {
             return Result.Failure(BookingErrors.PlayerAlreadyInBooking);
