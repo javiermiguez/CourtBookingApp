@@ -1,9 +1,8 @@
-﻿namespace Bookings.Domain
+﻿namespace Bookings.Domain;
+
+public enum PlayerRank
 {
-    public enum PlayerRank
-    {
-        Beginner = 0,
-        Intermediate = 1,
-        Professional = 2
-    }
+    Beginner = 0,
+    Intermediate = 1,
+    Professional = 2
 }

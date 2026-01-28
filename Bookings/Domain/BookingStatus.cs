@@ -1,11 +1,10 @@
-﻿namespace Bookings.Domain
+﻿namespace Bookings.Domain;
+
+public enum BookingStatus
 {
-    public enum BookingStatus
-    {
-        Pending = 0,
-        WaitingForPlayers = 1,
-        PendingPayment = 2,
-        Confirmed = 3,
-        Cancelled = 4
-    }
+    Pending = 0,
+    WaitingForPlayers = 1,
+    PendingPayment = 2,
+    Confirmed = 3,
+    Cancelled = 4
 }

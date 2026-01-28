@@ -1,8 +1,7 @@
-﻿namespace Bookings.Domain
+﻿namespace Bookings.Domain;
+
+public enum BookingMode
 {
-    public enum BookingMode
-    {
-        Direct = 0,
-        Matchmaking = 1
-    }
+    Direct = 0,
+    Matchmaking = 1
 }

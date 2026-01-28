@@ -1,24 +1,15 @@
-﻿namespace Bookings.Domain
+﻿namespace Bookings.Domain;
+
+// Value Object - Price
+public record Price(decimal Amount, Currency Currency)
 {
-    public struct Price
+    public Price Add(Price other)
     {
-        public decimal Amount { get; }
-        public Currency Currency { get; }
-
-        public Price(decimal amount, Currency currency)
+        if (Currency != other.Currency)
         {
-            Amount = amount;
-            Currency = currency;
+            throw new InvalidOperationException("Cannot add prices with different currencies.");
         }
 
-        public Price Add(Price other)
-        {
-            if (Currency != other.Currency)
-            {
-                throw new InvalidOperationException("Cannot add prices with different currencies.");
-            }
-
-            return new Price(Amount + other.Amount, Currency);
-        }
+        return new Price(Amount + other.Amount, Currency);
     }
 }

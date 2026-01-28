@@ -1,8 +1,7 @@
-﻿namespace Bookings.Domain
+﻿namespace Bookings.Domain;
+
+public enum MatchType
 {
-    public enum MatchType
-    {
-        Singles = 0,
-        Doubles = 1
-    }
+    Singles = 0,
+    Doubles = 1
 }

@@ -1,9 +1,8 @@
-﻿namespace Bookings.Domain
+﻿namespace Bookings.Domain;
+
+public enum Currency
 {
-    public enum Currency
-    {
-        EUR = 1,    // Euro
-        YUA = 2,    // Chinese Yuan
-        USD = 3     // US Dolar
-    }
+    EUR = 1,    // Euro
+    YUA = 2,    // Chinese Yuan
+    USD = 3     // US Dolar
 }
