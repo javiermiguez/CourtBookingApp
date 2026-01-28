@@ -75,9 +75,7 @@ public class BookingTests
         BookingStatus expectedStatus)
     {
         // Arrange
-        var configuration = new BookingConfiguration(
-            modality,
-            MatchType.Singles);
+        var configuration = new BookingConfiguration(modality, MatchType.Singles);
 
         // Act
         var booking = BookingTestFactory.CreateTestBooking(configuration: configuration);
