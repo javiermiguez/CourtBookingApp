@@ -87,7 +87,7 @@ public class Booking
 
     private Price CalculatePrice(decimal courtPricePerHour, Currency currency)
     {
-        var hours = BookingPeriod.Duration().TotalHours;
+        var hours = BookingPeriod.Duration.TotalHours;
         return new Price((decimal)hours * courtPricePerHour, currency);
     }
 

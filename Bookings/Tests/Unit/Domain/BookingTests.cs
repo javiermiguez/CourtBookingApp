@@ -63,7 +63,7 @@ public class BookingTests
             period: period, pricePerHour: pricePerHour);
 
         // Assert
-        Assert.Equal((decimal)period.Duration().TotalHours * pricePerHour, booking.Price.Amount);
+        Assert.Equal((decimal)period.Duration.TotalHours * pricePerHour, booking.Price.Amount);
     }
 
     [Theory]

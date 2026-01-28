@@ -18,7 +18,7 @@ public class PeriodTests
         // Assert
         Assert.Equal(start, period.Start);
         Assert.Equal(end, period.End);
-        Assert.Equal(TimeSpan.FromHours(2), period.Duration());
+        Assert.Equal(TimeSpan.FromHours(2), period.Duration);
     }
 
     [Fact]

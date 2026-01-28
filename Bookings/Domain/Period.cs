@@ -6,7 +6,7 @@ public record Period
     public DateTime Start { get; }
     public DateTime End { get; }
 
-    public TimeSpan Duration() => End - Start;
+    public TimeSpan Duration => End - Start;
 
     public Period(DateTime start, DateTime end)
     {
