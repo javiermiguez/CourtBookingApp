@@ -20,7 +20,6 @@ public class UserProfileService(IUserProfileRepository repository)
 
     public bool CanAddProfile(IEnumerable<UserProfile> existingProfiles, UserType newProfileType)
     {
-        // Esta é a túa regra de ouro: non repetir tipos de perfil
         return !existingProfiles.Any(p => p.Type == newProfileType);
     }
 }
