@@ -32,7 +32,7 @@ public class Booking
         Guid courtId,
         BookingConfiguration configuration,
         Period bookingPeriod,
-        PlayerRank userRank,
+        PlayerRank playerRank,
         decimal courtPricePerHour,
         Currency currency)
     {
@@ -62,7 +62,7 @@ public class Booking
         Price = CalculatePrice(courtPricePerHour, currency);
 
         // Add the requester as a player
-        _players.Add(new Player(userId, userRank, true));
+        _players.Add(new Player(userId, playerRank, true));
     }
 
     public static Booking Create(
@@ -70,7 +70,7 @@ public class Booking
         Guid courtId,
         BookingConfiguration configuration,
         Period bookingPeriod,
-        PlayerRank userRank,
+        PlayerRank playerRank,
         decimal courtPricePerHour,
         Currency currency)
     {
@@ -80,7 +80,7 @@ public class Booking
             courtId: courtId,
             configuration: configuration,
             bookingPeriod: bookingPeriod,
-            userRank: userRank,
+            playerRank: playerRank,
             courtPricePerHour: courtPricePerHour,
             currency: currency);
     }
