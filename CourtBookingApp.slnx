@@ -1,6 +1,7 @@
 <Solution>
   <Project Path="Bookings/Bookings.csproj" Id="2c98aa64-108e-4c4c-a58e-bbe1cfba768f" />
   <Project Path="Courts/Courts.csproj" Id="48f50eec-776e-4da7-8130-15cfc4abdd2f" />
+  <Project Path="Users.Tests/Users.Tests.csproj" Id="2dd14d17-3ad6-47a4-9464-6fa1bac6d31f" />
   <Project Path="Users/Users.csproj" Id="ce5aa482-04ad-47b2-b6bc-af8be166df6f" />
   <Project Path="Web/Web.csproj" />
 </Solution>
