@@ -1,7 +1,6 @@
 ﻿using Bookings.Common;
 using Bookings.Domain;
 using Bookings.Tests.Unit.Domain.TestFactories;
-using Xunit;
 
 namespace Bookings.Tests.Unit.Domain;
 
