@@ -2,7 +2,6 @@
 using Bookings.Domain;
 using Bookings.Tests.Unit.Domain.TestFactories;
 using Moq;
-using Xunit;
 
 namespace Bookings.Tests.Unit.Application;
 

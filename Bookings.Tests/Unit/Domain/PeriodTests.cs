@@ -1,5 +1,4 @@
 ﻿using Bookings.Domain;
-using Xunit;
 
 namespace Bookings.Tests.Unit.Domain;
 
