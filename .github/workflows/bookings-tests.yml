@@ -26,4 +26,4 @@ jobs:
 
       - name: Run xUnit tests for Bookings project
         run: |
-          dotnet test ./Bookings/Bookings.csproj --no-build --configuration Release --logger "trx;LogFileName=Bookings-test-results.trx"
+          dotnet test ./Bookings.Tests/Bookings.Tests.csproj --no-build --configuration Release --logger "trx;LogFileName=Bookings-test-results.trx"
