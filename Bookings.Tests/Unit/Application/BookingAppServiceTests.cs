@@ -1,4 +1,5 @@
 ﻿using Bookings.Application;
+using Bookings.Application.DTOs.Requests;
 using Bookings.Domain;
 using Bookings.Tests.Unit.Domain.TestFactories;
 using Moq;
@@ -27,15 +28,18 @@ public class BookingAppServiceTests
             .Returns(Task.CompletedTask);
 
         // Act
+        var request = new CreateBookingRequest(
+            CourtId: Guid.NewGuid(),
+            StartTime: DateTime.UtcNow.AddHours(1),
+            EndTime: DateTime.UtcNow.AddHours(2),
+            Modality: "Direct",
+            GameType: "Singles",
+            PlayerRank: "Intermediate",
+            CourtPricePerHour: 20.0m);
+
         var result = await _service.CreateBookingAsync(
             userId: Guid.NewGuid(),
-            courtId: Guid.NewGuid(),
-            startTime: DateTime.UtcNow.AddHours(1),
-            endTime: DateTime.UtcNow.AddHours(2),
-            modality: "Direct",
-            gameType: "Singles",
-            playerRank: "Intermediate",
-            courtPricePerHour: 20.0m);
+            request: request);
 
         // Assert
         Assert.NotNull(capturedBooking);
@@ -46,17 +50,21 @@ public class BookingAppServiceTests
     [Fact]
     public async Task CreateBookingAsync_InvalidModality_ShouldThrowException()
     {
+        // Arrange
+        var request = new CreateBookingRequest(
+            CourtId: Guid.NewGuid(),
+            StartTime: DateTime.UtcNow.AddHours(1),
+            EndTime: DateTime.UtcNow.AddHours(2),
+            Modality: "INVALID_MODALITY",
+            GameType: "Singles",
+            PlayerRank: "Intermediate",
+            CourtPricePerHour: 20.0m);
+
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
             _service.CreateBookingAsync(
                 userId: Guid.NewGuid(),
-                courtId: Guid.NewGuid(),
-                startTime: DateTime.UtcNow.AddHours(1),
-                endTime: DateTime.UtcNow.AddHours(2),
-                modality: "INVALID_MODALITY",
-                gameType: "Singles",
-                playerRank: "Intermediate",
-                courtPricePerHour: 20.0m));
+                request: request));
     }
 
     [Fact]
@@ -68,6 +76,10 @@ public class BookingAppServiceTests
             configuration: new BookingConfiguration(BookingModality.Matchmaking, GameType.Singles),
             rank: PlayerRank.Intermediate);
 
+        var request = new AddPlayerRequest(
+            PlayerId: Guid.NewGuid(),
+            PlayerRank: "Intermediate");
+
         _mockRepository.Setup(r => r.GetByIdAsync(bookingId))
             .ReturnsAsync(existingBooking);
 
@@ -77,8 +89,7 @@ public class BookingAppServiceTests
         // Act
         var result = await _service.AddPlayerAsync(
             bookingId: bookingId,
-            playerId: Guid.NewGuid(),
-            playerRank: "Intermediate");
+            request: request);
 
         // Assert
         Assert.True(result);
@@ -89,14 +100,17 @@ public class BookingAppServiceTests
     public async Task AddPlayerAsync_BookingNotFound_ShouldReturnFalse()
     {
         // Arrange
+        var request = new AddPlayerRequest(
+            PlayerId: Guid.NewGuid(),
+            PlayerRank: "Intermediate");
+
         _mockRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync((Booking?)null); // ← Non existe
+            .ReturnsAsync((Booking?)null);
 
         // Act
         var result = await _service.AddPlayerAsync(
             bookingId: Guid.NewGuid(),
-            playerId: Guid.NewGuid(),
-            playerRank: "Intermediate");
+            request: request);
 
         // Assert
         Assert.False(result);
@@ -108,9 +122,12 @@ public class BookingAppServiceTests
     {
         // Arrange
         var bookingId = Guid.NewGuid();
-
         var directBooking = BookingTestFactory.CreateTestBooking(
             configuration: new BookingConfiguration(BookingModality.Direct, GameType.Singles));
+
+        var request = new AddPlayerRequest(
+            PlayerId: Guid.NewGuid(),
+            PlayerRank: "Intermediate");
 
         _mockRepository.Setup(r => r.GetByIdAsync(bookingId))
             .ReturnsAsync(directBooking);
@@ -118,8 +135,7 @@ public class BookingAppServiceTests
         // Act
         var result = await _service.AddPlayerAsync(
             bookingId: bookingId,
-            playerId: Guid.NewGuid(),
-            playerRank: "Intermediate");
+            request: request);
 
         // Assert
         Assert.False(result);

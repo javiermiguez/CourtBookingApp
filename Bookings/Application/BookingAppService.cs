@@ -1,4 +1,7 @@
-﻿using Bookings.Domain;
+﻿using Bookings.Application.DTOs.Requests;
+using Bookings.Application.DTOs.Responses;
+using Bookings.Common;
+using Bookings.Domain;
 
 namespace Bookings.Application;
 
@@ -13,59 +16,77 @@ public class BookingAppService
 
     public async Task<Guid> CreateBookingAsync(
         Guid userId,
-        Guid courtId,
-        DateTime startTime,
-        DateTime endTime,
-        string modality,
-        string gameType,
-        string playerRank,
-        decimal courtPricePerHour)
+        CreateBookingRequest request)
     {
-        if (!Enum.TryParse<BookingModality>(modality, out var parsedModality))
-            throw new ArgumentException("Invalid modality");
+        if (!Enum.TryParse<BookingModality>(request.Modality, out var parsedModality))
+        {
+            throw new ArgumentException($"Invalid modality: {request.Modality}");
+        }
 
-        var period = new Period(startTime, endTime);
-        var config = new BookingConfiguration(
-            parsedModality,
-            Enum.Parse<GameType>(gameType));
+        if (!Enum.TryParse<GameType>(request.GameType, out var parsedGameType))
+        {
+            throw new ArgumentException($"Invalid game type: {request.GameType}");
+        }
 
+        if (!Enum.TryParse<PlayerRank>(request.PlayerRank, out var parsedPlayerRank))
+        {
+            throw new ArgumentException($"Invalid player rank: {request.PlayerRank}");
+        }
+
+        var period = new Period(request.StartTime, request.EndTime);
+        var config = new BookingConfiguration(parsedModality, parsedGameType);
+
+        // NOTE: Currency should be configurable by deploy
+        // region or user preference in a production ready app
         var booking = Booking.Create(
             userId,
-            courtId,
+            request.CourtId,
             config,
             period,
-            Enum.Parse<PlayerRank>(playerRank),
-            courtPricePerHour,
+            parsedPlayerRank,
+            request.CourtPricePerHour,
             Currency.EUR);
 
         await _repository.AddAsync(booking);
-
         return booking.Id;
     }
 
     public async Task<bool> AddPlayerAsync(
         Guid bookingId,
-        Guid playerId,
-        string playerRank)
+        AddPlayerRequest request)
     {
-        var booking = await _repository.GetByIdAsync(bookingId);
-        if (booking == null)
-            return false;
+        if (!Enum.TryParse<PlayerRank>(request.PlayerRank, out var parsedPlayerRank))
+        {
+            throw new ArgumentException($"Invalid player rank: {request.PlayerRank}");
+        }
 
-        var result = booking.AddPlayer(
-            playerId,
-            Enum.Parse<PlayerRank>(playerRank));
+        var booking = await _repository.GetByIdAsync(bookingId);
+
+        if (booking == null)
+        {
+            return false;
+        }
+
+        var result = booking.AddPlayer(request.PlayerId, parsedPlayerRank);
 
         if (!result.IsSuccess)
+        {
             return false;
+        }
 
         await _repository.UpdateAsync(booking);
-
         return true;
     }
 
-    public async Task<Booking?> GetBookingAsync(Guid id)
+    public async Task<BookingResponse?> GetBookingResponseAsync(Guid id)
     {
-        return await _repository.GetByIdAsync(id);
+        var booking = await _repository.GetByIdAsync(id);
+
+        if (booking == null)
+        {
+            return null;
+        }
+
+        return booking.ToResponse();
     }
 }
