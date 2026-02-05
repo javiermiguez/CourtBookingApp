@@ -1,5 +1,6 @@
 ﻿using Bookings.Application.DTOs.Requests;
 using Bookings.Application.DTOs.Responses;
+using Bookings.Common;
 using Bookings.Domain;
 
 namespace Bookings.Application;
@@ -22,10 +23,18 @@ public class BookingAppService
             throw new ArgumentException($"Invalid modality: {request.Modality}");
         }
 
+        if (!Enum.TryParse<GameType>(request.GameType, out var parsedGameType))
+        {
+            throw new ArgumentException($"Invalid game type: {request.GameType}");
+        }
+
+        if (!Enum.TryParse<PlayerRank>(request.PlayerRank, out var parsedPlayerRank))
+        {
+            throw new ArgumentException($"Invalid player rank: {request.PlayerRank}");
+        }
+
         var period = new Period(request.StartTime, request.EndTime);
-        var config = new BookingConfiguration(
-            parsedModality,
-            Enum.Parse<GameType>(request.GameType));
+        var config = new BookingConfiguration(parsedModality, parsedGameType);
 
         // NOTE: Currency should be configurable by deploy
         // region or user preference in a production ready app
@@ -34,7 +43,7 @@ public class BookingAppService
             request.CourtId,
             config,
             period,
-            Enum.Parse<PlayerRank>(request.PlayerRank),
+            parsedPlayerRank,
             request.CourtPricePerHour,
             Currency.EUR);
 
@@ -46,6 +55,11 @@ public class BookingAppService
         Guid bookingId,
         AddPlayerRequest request)
     {
+        if (!Enum.TryParse<PlayerRank>(request.PlayerRank, out var parsedPlayerRank))
+        {
+            throw new ArgumentException($"Invalid player rank: {request.PlayerRank}");
+        }
+
         var booking = await _repository.GetByIdAsync(bookingId);
 
         if (booking == null)
@@ -53,9 +67,7 @@ public class BookingAppService
             return false;
         }
 
-        var result = booking.AddPlayer(
-            request.PlayerId,
-            Enum.Parse<PlayerRank>(request.PlayerRank));
+        var result = booking.AddPlayer(request.PlayerId, parsedPlayerRank);
 
         if (!result.IsSuccess)
         {
@@ -75,25 +87,6 @@ public class BookingAppService
             return null;
         }
 
-        return MapToResponse(booking);
-    }
-
-    private BookingResponse MapToResponse(Booking booking)
-    {
-        return new BookingResponse(
-            booking.Id,
-            booking.UserId,
-            booking.CourtId,
-            booking.Status.ToString(),
-            booking.Configuration.Modality.ToString(),
-            booking.Configuration.GameType.ToString(),
-            booking.BookingPeriod.Start,
-            booking.BookingPeriod.End,
-            booking.Price.Amount,
-            booking.Price.Currency.ToString(),
-            booking.Players.Select(p => new PlayerResponse(
-                p.UserId,
-                p.Rank.ToString(),
-                p.IsRequester)));
+        return booking.ToResponse();
     }
 }
