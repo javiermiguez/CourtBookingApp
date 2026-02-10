@@ -5,7 +5,7 @@ namespace Bookings.Tests.Unit.Domain.TestFactories;
 
 public class BookingTestFactory
 {
-    public static Booking CreateTestBooking(
+    public static Booking CreateBooking(
         Guid? userId = null,
         Guid? courtId = null,
         BookingConfiguration? configuration = null,

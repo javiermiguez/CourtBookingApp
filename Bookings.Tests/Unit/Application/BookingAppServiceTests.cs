@@ -72,7 +72,7 @@ public class BookingAppServiceTests
     {
         // Arrange
         var bookingId = Guid.NewGuid();
-        var existingBooking = BookingTestFactory.CreateTestBooking(
+        var existingBooking = BookingTestFactory.CreateBooking(
             configuration: new BookingConfiguration(BookingModality.Matchmaking, GameType.Singles),
             rank: PlayerRank.Intermediate);
 
@@ -122,7 +122,7 @@ public class BookingAppServiceTests
     {
         // Arrange
         var bookingId = Guid.NewGuid();
-        var directBooking = BookingTestFactory.CreateTestBooking(
+        var directBooking = BookingTestFactory.CreateBooking(
             configuration: new BookingConfiguration(BookingModality.Direct, GameType.Singles));
 
         var request = new AddPlayerRequest(

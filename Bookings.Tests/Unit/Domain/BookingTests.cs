@@ -14,7 +14,7 @@ public class BookingTests
         var courtId = Guid.NewGuid();
 
         // Act
-        var booking = BookingTestFactory.CreateTestBooking(
+        var booking = BookingTestFactory.CreateBooking(
             userId: userId, courtId: courtId);
 
         // Assert
@@ -34,7 +34,7 @@ public class BookingTests
 
         // Act & Assert
         Assert.Throws<DomainException>(() =>
-            BookingTestFactory.CreateTestBooking(period: pastPeriod));
+            BookingTestFactory.CreateBooking(period: pastPeriod));
     }
 
     [Theory]
@@ -44,7 +44,7 @@ public class BookingTests
     {
         // Act & Assert
         Assert.Throws<DomainException>(() =>
-            BookingTestFactory.CreateTestBooking(pricePerHour: invalidPrice));
+            BookingTestFactory.CreateBooking(pricePerHour: invalidPrice));
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public class BookingTests
         var pricePerHour = 30.0m;
 
         // Act
-        var booking = BookingTestFactory.CreateTestBooking(
+        var booking = BookingTestFactory.CreateBooking(
             period: period, pricePerHour: pricePerHour);
 
         // Assert
@@ -76,7 +76,7 @@ public class BookingTests
         var configuration = new BookingConfiguration(modality, GameType.Singles);
 
         // Act
-        var booking = BookingTestFactory.CreateTestBooking(configuration: configuration);
+        var booking = BookingTestFactory.CreateBooking(configuration: configuration);
 
         // Assert
         Assert.Equal(expectedStatus, booking.Status);
@@ -86,7 +86,7 @@ public class BookingTests
     public void AddPlayer_ToMatchmakingBooking_ShouldWork()
     {
         // Arrange
-        var booking = BookingTestFactory.CreateTestBooking(
+        var booking = BookingTestFactory.CreateBooking(
             configuration: new BookingConfiguration(BookingModality.Matchmaking, GameType.Doubles),
             rank: PlayerRank.Intermediate);
 
@@ -104,7 +104,7 @@ public class BookingTests
     public void AddPlayer_ToDirectBooking_ShouldFail()
     {
         // Arrange
-        var booking = BookingTestFactory.CreateTestBooking(
+        var booking = BookingTestFactory.CreateBooking(
             configuration: new BookingConfiguration(BookingModality.Direct, GameType.Doubles),
             rank: PlayerRank.Intermediate);
 
@@ -123,7 +123,7 @@ public class BookingTests
     public void Booking_ShouldRespectMaxPlayers(GameType matchType, int maxPlayers)
     {
         // Arrange
-        var booking = BookingTestFactory.CreateTestBooking(
+        var booking = BookingTestFactory.CreateBooking(
             configuration: new BookingConfiguration(BookingModality.Matchmaking, matchType),
             rank: PlayerRank.Intermediate);
 
