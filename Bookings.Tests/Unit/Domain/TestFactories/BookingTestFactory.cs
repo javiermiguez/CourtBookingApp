@@ -1,5 +1,4 @@
 ﻿using Bookings.Domain;
-using GameType = Bookings.Domain.GameType;
 
 namespace Bookings.Tests.Unit.Domain.TestFactories;
 
