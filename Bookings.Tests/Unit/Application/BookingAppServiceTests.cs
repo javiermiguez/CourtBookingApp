@@ -40,12 +40,12 @@ public class BookingAppServiceTests
             request: request);
 
         Assert.NotNull(capturedBooking);
-        Assert.NotEqual(Guid.Empty, result);
+        Assert.NotEqual(Guid.Empty, result.Value);
         _mockRepository.Verify(r => r.AddAsync(It.IsAny<Booking>()), Times.Once);
     }
 
     [Fact]
-    public async Task CreateBookingAsync_InvalidModality_ShouldThrowException()
+    public async Task CreateBookingAsync_InvalidModality_ShouldReturnFalse()
     {
         var request = new CreateBookingRequest(
             CourtId: Guid.NewGuid(),
@@ -56,10 +56,11 @@ public class BookingAppServiceTests
             PlayerRank: "Intermediate",
             CourtPricePerHour: 20.0m);
 
-        await Assert.ThrowsAsync<ArgumentException>(() =>
-            _service.CreateBookingAsync(
-                userId: Guid.NewGuid(),
-                request: request));
+        var result = await _service.CreateBookingAsync(
+            userId: Guid.NewGuid(),
+            request: request);
+
+        Assert.False(result.IsSuccess);
     }
 
     [Fact]
@@ -84,7 +85,7 @@ public class BookingAppServiceTests
             bookingId: bookingId,
             request: request);
 
-        Assert.True(result);
+        Assert.True(result.IsSuccess);
         _mockRepository.Verify(r => r.UpdateAsync(It.IsAny<Booking>()), Times.Once);
     }
 
@@ -102,7 +103,7 @@ public class BookingAppServiceTests
             bookingId: Guid.NewGuid(),
             request: request);
 
-        Assert.False(result);
+        Assert.False(result.IsSuccess);
         _mockRepository.Verify(r => r.UpdateAsync(It.IsAny<Booking>()), Times.Never);
     }
 
@@ -124,7 +125,7 @@ public class BookingAppServiceTests
             bookingId: bookingId,
             request: request);
 
-        Assert.False(result);
+        Assert.False(result.IsSuccess);
         _mockRepository.Verify(r => r.UpdateAsync(It.IsAny<Booking>()), Times.Never);
     }
 }
