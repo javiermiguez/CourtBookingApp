@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace Bookings.Application;
 
-public class BookingAppService
+public class BookingAppService : IBookingAppService
 {
     private readonly IBookingRepository _repository;
 

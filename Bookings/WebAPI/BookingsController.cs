@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 [Route("api/[controller]")]
 public class BookingsController : ControllerBase
 {
-    private readonly BookingAppService _bookingService;
+    private readonly IBookingAppService _bookingService;
 
-    public BookingsController(BookingAppService bookingService)
+    public BookingsController(IBookingAppService bookingService)
     {
         _bookingService = bookingService;
     }
@@ -43,7 +43,7 @@ public class BookingsController : ControllerBase
     {
         var booking = await _bookingService.GetBookingResponseAsync(id);
 
-        if (booking == null)
+        if (!booking.IsSuccess)
             return NotFound();
 
         return Ok(booking);
