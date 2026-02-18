@@ -2,6 +2,8 @@
 using Bookings.Application.DTOs.Responses;
 using Bookings.Common;
 using Bookings.Domain;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace Bookings.Application;
 
@@ -14,79 +16,110 @@ public class BookingAppService
         _repository = repository;
     }
 
-    public async Task<Guid> CreateBookingAsync(
+    public async Task<Result<Guid>> CreateBookingAsync(
         Guid userId,
         CreateBookingRequest request)
     {
-        if (!Enum.TryParse<BookingModality>(request.Modality, out var parsedModality))
+        var modalityResult = EnumParser.TryParse<BookingModality>(request.Modality);
+        if (!modalityResult.IsSuccess) return Result.Failure<Guid>(modalityResult.Error);
+
+        var gameTypeResult = EnumParser.TryParse<GameType>(request.GameType);
+        if (!gameTypeResult.IsSuccess) return Result.Failure<Guid>(gameTypeResult.Error);
+
+        var playerRankResult = EnumParser.TryParse<PlayerRank>(request.PlayerRank);
+        if (!playerRankResult.IsSuccess) return Result.Failure<Guid>(playerRankResult.Error);
+
+        Booking booking;
+
+        try
         {
-            throw new ArgumentException($"Invalid modality: {request.Modality}");
+            var period = new Period(request.StartTime, request.EndTime);
+            var config = new BookingConfiguration(modalityResult.Value, gameTypeResult.Value);
+
+            // NOTE: Currency should be configurable by deploy
+            // region or user preference in a production ready app
+            booking = Booking.Create(
+                userId,
+                request.CourtId,
+                config,
+                period,
+                playerRankResult.Value,
+                request.CourtPricePerHour,
+                Currency.EUR);
+        }
+        catch (DomainException ex)
+        {
+            return Result.Failure<Guid>(ApplicationErrors.DomainError(ex.Message));
+        }
+        catch (ArgumentException ex)
+        {
+            return Result.Failure<Guid>(ApplicationErrors.InvalidBookingData(ex.Message));
         }
 
-        if (!Enum.TryParse<GameType>(request.GameType, out var parsedGameType))
+        try
         {
-            throw new ArgumentException($"Invalid game type: {request.GameType}");
+            await _repository.AddAsync(booking);
+        }
+        catch (DbUpdateException ex)
+        {
+            Debug.WriteLine($"Database error while creating booking: {ex.Message}");
+            return Result.Failure<Guid>(ApplicationErrors.DatabaseError());
         }
 
-        if (!Enum.TryParse<PlayerRank>(request.PlayerRank, out var parsedPlayerRank))
-        {
-            throw new ArgumentException($"Invalid player rank: {request.PlayerRank}");
-        }
-
-        var period = new Period(request.StartTime, request.EndTime);
-        var config = new BookingConfiguration(parsedModality, parsedGameType);
-
-        // NOTE: Currency should be configurable by deploy
-        // region or user preference in a production ready app
-        var booking = Booking.Create(
-            userId,
-            request.CourtId,
-            config,
-            period,
-            parsedPlayerRank,
-            request.CourtPricePerHour,
-            Currency.EUR);
-
-        await _repository.AddAsync(booking);
-        return booking.Id;
+        return Result.Success(booking.Id);
     }
 
-    public async Task<bool> AddPlayerAsync(
+    public async Task<Result> AddPlayerAsync(
         Guid bookingId,
         AddPlayerRequest request)
     {
-        if (!Enum.TryParse<PlayerRank>(request.PlayerRank, out var parsedPlayerRank))
-        {
-            throw new ArgumentException($"Invalid player rank: {request.PlayerRank}");
-        }
+        var playerRankResult = EnumParser.TryParse<PlayerRank>(request.PlayerRank);
+        if (!playerRankResult.IsSuccess) return Result.Failure(playerRankResult.Error);
 
         var booking = await _repository.GetByIdAsync(bookingId);
-
         if (booking == null)
-        {
-            return false;
-        }
+            return Result.Failure(ApplicationErrors.BookingNotFound(bookingId));
 
-        var result = booking.AddPlayer(request.PlayerId, parsedPlayerRank);
+        var result = booking.AddPlayer(request.PlayerId, playerRankResult.Value);
 
         if (!result.IsSuccess)
         {
-            return false;
+            return result.Error.Code switch
+            {
+                nameof(BookingErrors.OnlyMatchmakingCanAddPlayers) =>
+                    Result.Failure(ApplicationErrors.DomainError(result.Error.Message)),
+                nameof(BookingErrors.BookingNotWaiting) =>
+                    Result.Failure(ApplicationErrors.DomainError(result.Error.Message)),
+                nameof(BookingErrors.InvalidPlayerRank) =>
+                    Result.Failure(ApplicationErrors.DomainError(result.Error.Message)),
+                nameof(BookingErrors.PlayerAlreadyInBooking) =>
+                    Result.Failure(ApplicationErrors.DomainError(result.Error.Message)),
+                _ => Result.Failure(result.Error)
+            };
         }
 
-        await _repository.UpdateAsync(booking);
-        return true;
+        try
+        {
+            await _repository.UpdateAsync(booking);
+        }
+        catch (DbUpdateException ex)
+        {
+            Debug.WriteLine($"Database error while adding a player: {ex.Message}");
+            return Result.Failure(ApplicationErrors.DatabaseError());
+        }
+
+        return Result.Success();
     }
 
-    public async Task<BookingResponse?> GetBookingResponseAsync(Guid id)
+    public async Task<Result<BookingResponse>> GetBookingResponseAsync(Guid id)
     {
         var booking = await _repository.GetByIdAsync(id);
 
         if (booking == null)
         {
-            return null;
+            return Result.Failure<BookingResponse>(ApplicationErrors.BookingNotFound(id));
         }
 
-        return booking.ToResponse();
+        return Result.Success(booking.ToResponse());
     }
 }
