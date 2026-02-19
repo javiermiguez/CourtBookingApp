@@ -19,4 +19,8 @@ public static class BookingErrors
     public static readonly Error PlayerAlreadyInBooking = new(
         "Booking.PlayerAlreadyInBooking",
         "Player is already in this booking");
+
+    public static readonly Error CannotDeleteConfirmed = new(
+        "Booking.CannotDeleteConfirmed",
+        "Cannot delete a confirmed booking");
 }

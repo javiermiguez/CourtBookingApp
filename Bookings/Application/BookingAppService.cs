@@ -122,4 +122,43 @@ public class BookingAppService : IBookingAppService
 
         return Result.Success(booking.ToResponse());
     }
+
+    public async Task<Result> DeleteBookingAsync(Guid id, Guid userId)
+    {
+        var booking = await _repository.GetByIdAsync(id);
+
+        if (booking == null)
+        {
+            return Result.Failure(ApplicationErrors.BookingNotFound(id));
+        }
+
+        if (booking.UserId != userId)
+        {
+            return Result.Failure(ApplicationErrors.Unauthorized("Booking does not belong to the user"));
+        }
+
+        var canDeleteResult = booking.CanDelete();
+
+        if (!canDeleteResult.IsSuccess)
+        {
+            return canDeleteResult.Error.Code switch
+            {
+                nameof(BookingErrors.CannotDeleteConfirmed) =>
+                    Result.Failure(ApplicationErrors.DomainError(canDeleteResult.Error.Message)),
+                _ => Result.Failure(canDeleteResult.Error)
+            };
+        }
+
+        try
+        {
+            await _repository.DeleteAsync(booking);
+        }
+        catch (DbUpdateException ex)
+        {
+            Debug.WriteLine($"Database error while deleting a booking: {ex.Message}");
+            return Result.Failure(ApplicationErrors.DatabaseError());
+        }
+
+        return Result.Success();
+    }
 }

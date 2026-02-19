@@ -49,6 +49,18 @@ public class BookingsController : ControllerBase
         return Ok(booking);
     }
 
+    [HttpDelete("{id}")]
+    public async Task<ActionResult<Guid>> DeleteBooking(Guid id)
+    {
+        var userId = _bookingService.GetBookingResponseAsync(id).Result.Value.UserId; // Get UserId from JWT token (to be implemented)
+        var result = await _bookingService.DeleteBookingAsync(id, userId);
+
+        if (!result.IsSuccess)
+            return ErrorToActionResult(result.Error);
+
+        return Ok();
+    }
+
     private ActionResult ErrorToActionResult(Error error)
     {
         var detail = error.Message;
@@ -72,7 +84,8 @@ public class BookingsController : ControllerBase
             "Booking.OnlyMatchmakingCanAddPlayers" or
             "Booking.BookingNotWaiting" or
             "Booking.InvalidPlayerRank" or
-            "Booking.PlayerAlreadyInBooking" => Conflict(new ProblemDetails
+            "Booking.PlayerAlreadyInBooking" or
+            "Booking.CannotDeleteConfirmed" => Conflict(new ProblemDetails
             {
                 Type = "https://tools.ietf.org/html/rfc9110#section-15.5.10",
                 Status = 409,
