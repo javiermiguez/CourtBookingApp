@@ -24,4 +24,7 @@ public static class ApplicationErrors
 
     public static Error DomainError(string message) =>
         new("DomainError", message);
+
+    public static Error Unauthorized(string details) =>
+        new("Unauthorized", details);
 }

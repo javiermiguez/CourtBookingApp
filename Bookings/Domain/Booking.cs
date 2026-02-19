@@ -148,4 +148,14 @@ public class Booking
         GameType.Doubles => 4,
         _ => throw new InvalidOperationException("Unknown game type")
     };
+
+    public Result CanDelete()
+    {
+        if (Status == BookingStatus.Confirmed)
+        {
+            return Result.Failure(BookingErrors.CannotDeleteConfirmed);
+        }
+
+        return Result.Success();
+    }
 }
