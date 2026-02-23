@@ -11,6 +11,11 @@ public class UserProfile
     public string? IdentificationDocument { get; set; }
     public Location? Location { get; set; }
 
+    private UserProfile()
+    {
+        Name = null!;
+    }
+
     public UserProfile(Guid userId, UserType type, FullName name, PlayerRank? rank = null)
     {
         Id = Guid.NewGuid();
