@@ -2,6 +2,6 @@
 
 public enum UserType
 {
-    Player,
-    CourtOwner
+    Player = 1,
+    CourtOwner = 2,
 }
