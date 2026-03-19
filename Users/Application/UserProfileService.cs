@@ -1,6 +1,7 @@
 ﻿using Users.Common;
+using Users.Domain;
 
-namespace Users.Domain;
+namespace Users.Application;
 
 public class UserProfileService(IUserProfileRepository repository)
 {

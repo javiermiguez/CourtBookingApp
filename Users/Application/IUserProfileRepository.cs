@@ -1,4 +1,6 @@
-﻿namespace Users.Domain;
+﻿using Users.Domain;
+
+namespace Users.Application;
 
 public interface IUserProfileRepository
 {

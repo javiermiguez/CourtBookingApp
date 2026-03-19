@@ -7,9 +7,9 @@ public class UserProfile
     public UserType Type { get; private set; }
     public FullName Name { get; private set; }
     public PlayerRank? PlayerRank { get; private set; }
-    public DateTime? BirthDate { get; set; }
-    public string? IdentificationDocument { get; set; }
-    public Location? Location { get; set; }
+    public DateTime? BirthDate { get; private set; }
+    public string? IdentificationDocument { get; private set; }
+    public Location? Location { get; private set; }
 
     private UserProfile()
     {
@@ -26,4 +26,21 @@ public class UserProfile
     }
 
     public bool IsPlayer() => Type == UserType.Player;
+
+    public void UpdatePersonalInformation(DateTime? birthDate, string? document)
+    {
+        // Will add some validation logic here
+        BirthDate = birthDate;
+        IdentificationDocument = document;
+    }
+
+    public void UpdateLocation(Location? newLocation)
+    {
+        Location = newLocation;
+    }
+
+    public void UpdateRank(PlayerRank newRank)
+    {
+        PlayerRank = newRank;
+    }
 }
