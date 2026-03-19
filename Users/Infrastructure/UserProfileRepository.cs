@@ -15,14 +15,12 @@ public class UserProfileRepository : IUserProfileRepository
 
     public async Task<UserProfile?> GetByIdAsync(Guid id)
     {
-        // Buscamos polo ID da entidade perfil
         return await _context.UserProfiles
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task<IEnumerable<UserProfile>> GetByUserIdAsync(Guid userId)
     {
-        // Como un usuario pode ter varios perfís, devolvemos a lista filtrada
         return await _context.UserProfiles
             .Where(p => p.UserId == userId)
             .ToListAsync();

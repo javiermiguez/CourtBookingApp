@@ -1,4 +1,4 @@
-﻿namespace Users.Infrastructure;
+﻿namespace Users.Domain;
 
 public class User
 {

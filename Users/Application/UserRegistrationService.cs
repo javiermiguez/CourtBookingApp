@@ -1,4 +1,4 @@
-﻿namespace Users.Domain;
+﻿namespace Users.Application;
 
 public class UserRegistrationService
 {
