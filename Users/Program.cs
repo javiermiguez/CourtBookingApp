@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Users.Application;
 using Users.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,9 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<UsersDbContext>(options =>
     options.UseInMemoryDatabase("UsersDb"));
+
+builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+builder.Services.AddScoped<UserProfileService>();
 
 var app = builder.Build();
 

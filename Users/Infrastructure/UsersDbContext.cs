@@ -18,12 +18,6 @@ public class UsersDbContext : DbContext
         {
             entity.HasKey(u => u.Id);
             entity.Property(u => u.Email).IsRequired();
-
-            entity.Property(u => u.ProfileIds)
-                .HasConversion(
-                    v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions)null!),
-                    v => System.Text.Json.JsonSerializer.Deserialize<List<Guid>>(v, (System.Text.Json.JsonSerializerOptions)null!) ?? new List<Guid>()
-                );
         });
 
         modelBuilder.Entity<UserProfile>(entity =>
